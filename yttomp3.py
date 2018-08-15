@@ -3,7 +3,7 @@ import time
 import os
 import pafy
 import pip
-
+from threading import Thread
 
 
 def install_and_import(package):
@@ -21,6 +21,7 @@ def checkexistance(fname):
 	    return False
 	else:
 	    return True
+
 def download(contents):
 	for i in contents:
 		url = i[0]
@@ -37,10 +38,29 @@ def download(contents):
 		best.download()
 		os.rename(title+".webm",new_name)
 
+def getnewname(name):
+	new_name = ""
+	for j in name[1:]:
+		new_name = new_name+" "+ j
+	new_name = new_name[1:]
+	return new_name
+
+def downloadonesong(youtubelink,name):
+	url = youtubelink
+	audio = pafy.new(url)
+	title = audio.title
+	best = audio.getbestaudio()
+	print(best.resolution, best.extension)
+	best.download()
+	os.rename(title+".webm",name)
+
+
+
 def main():
 	install_and_import('pygame')
 	install_and_import('pafy')
 	fname = sys.argv[1]
+	
 	if not checkexistance(fname):
 		print("This file does not exist.Exiting......")
 		time.sleep(2)
@@ -51,7 +71,18 @@ def main():
 		contents = list(contents.splitlines())
 		for i in range(len(contents)):
 			contents[i] = list(contents[i].split(" "))
-		download(contents)
+		#thread = Thread(target = download1, args = [sys.argv[1:]])
+		threadlist = []
+		
+		for i in contents:
+			new_name  = getnewname(i)
+			threadlist.append(Thread(target = downloadonesong, args = [i[0],new_name]))
+		for i in threadlist:
+			i.start()
+		for i in threadlist:
+			i.join()
+		os.system('cls' if os.name == 'nt' else 'clear')
+		#download(contents)
 		#print(contents)
 		#contents ready
 		
