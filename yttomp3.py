@@ -39,6 +39,7 @@ def download(contents):
 
 def main():
 	install_and_import('pygame')
+	install_and_import('pafy')
 	fname = sys.argv[1]
 	if not checkexistance(fname):
 		print("This file does not exist.Exiting......")
@@ -57,5 +58,4 @@ def main():
 
 
 if __name__== "__main__":
-
 	main()
